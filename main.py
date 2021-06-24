@@ -6,13 +6,26 @@ import pdb
 
 total_trade = 0
 kite = sp.kite
-df20 = pd.read_csv('https://www1.nseindia.com/content/indices/ind_Nifty_Midcap_Liquid15.csv')
+#https://www1.nseindia.com/content/indices/ind_Nifty100_Liquid15.csv
+#https://www1.nseindia.com/content/indices/ind_Nifty_Midcap_Liquid15.csv
+#https://www1.nseindia.com/content/indices/ind_nifty200Momentum30_list.csv
+#https://www1.nseindia.com/content/indices/ind_nifty50list.csv
+#https://www1.nseindia.com/content/indices/ind_nifty100list.csv
+#https://www1.nseindia.com/content/indices/ind_nifty200list.csv
+df20 = pd.read_csv('https://www1.nseindia.com/content/indices/ind_nifty200list.csv')
 df20['nse'] = 'NSE:' + df20['Symbol']
 watchlist = df20['Symbol'].tolist()
 risk_per_trade = 100
 
 temp = {'name':None, 'entry_price': None, 'buy_sell': None, 'qty': None, 'sl': None, 'traded':None, 'parent_order': None, 'sl_order':None, 'target':None, 'target_order': None}
 status = {name: temp.copy() for name in watchlist}
+
+print("Waiting for market to open")
+dtime = datetime.datetime.now()
+while dtime.time() < datetime.time(9, 30):
+	dtime = datetime.datetime.now()
+print('Getting in')
+
 
 while True:
 	print("going for round 1")
@@ -26,7 +39,7 @@ while True:
 			buy_condition, sell_condition = sp.check_entry(df15, name, dfday, completed_candle)
 			row = df15.loc[completed_candle]
 			# Buy Entry
-			if (buy_condition) and (status[name]['traded'] is None) and (total_trade <= 4):
+			if (buy_condition) and (status[name]['traded'] is None):
 				print(f"Buy {name}")
 				try:
 					status[name]['name'] = name
@@ -39,12 +52,11 @@ while True:
 					parent_order = kite.place_order(variety = kite.VARIETY_REGULAR, exchange = kite.EXCHANGE_NSE, tradingsymbol = name, transaction_type = kite.TRANSACTION_TYPE_BUY, quantity= status[name]['qty'], product = kite.PRODUCT_MIS, order_type = kite.ORDER_TYPE_SLM, price=None, validity=None, disclosed_quantity=None, trigger_price=status[name]['entry_price'], squareoff=None, stoploss=None, trailing_stoploss=None, tag=None)
 					status[name]['parent_order'] = parent_order
 					status[name]['traded'] = 'yes'
-					total_trade = total_trade + 1
 				except Exception as e:
 					print(f"Error in buy {e}")
 					continue
 			# Sell Entry
-			if (sell_condition) and (status[name]['traded'] is None) and (total_trade <= 4):
+			if (sell_condition) and (status[name]['traded'] is None):
 				print(f"Sell {name}")
 				try:
 					status[name]['name'] = name
@@ -57,7 +69,6 @@ while True:
 					parent_order = kite.place_order(variety = kite.VARIETY_REGULAR, exchange = kite.EXCHANGE_NSE, tradingsymbol = name, transaction_type = kite.TRANSACTION_TYPE_SELL, quantity= status[name]['qty'], product = kite.PRODUCT_MIS, order_type = kite.ORDER_TYPE_SLM, price=None, validity=None, disclosed_quantity=None, trigger_price=status[name]['entry_price'], squareoff=None, stoploss=None, trailing_stoploss=None, tag=None)
 					status[name]['parent_order'] = parent_order
 					status[name]['traded'] = 'yes'
-					total_trade = total_trade + 1
 				except Exception as e:
 					print(f"Error in sell {e}")
 					continue    
