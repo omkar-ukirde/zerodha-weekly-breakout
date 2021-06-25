@@ -12,13 +12,14 @@ kite = sp.kite
 #https://www1.nseindia.com/content/indices/ind_nifty50list.csv
 #https://www1.nseindia.com/content/indices/ind_nifty100list.csv
 #https://www1.nseindia.com/content/indices/ind_nifty200list.csv
-df20 = pd.read_csv('https://www1.nseindia.com/content/indices/ind_nifty200list.csv')
+df20 = pd.read_csv('https://www1.nseindia.com/content/indices/ind_nifty200Momentum30_list.csv')
 df20['nse'] = 'NSE:' + df20['Symbol']
 watchlist = df20['Symbol'].tolist()
 risk_per_trade = 100
 
 temp = {'name':None, 'entry_price': None, 'buy_sell': None, 'qty': None, 'sl': None, 'traded':None, 'parent_order': None, 'sl_order':None, 'target':None, 'target_order': None}
 status = {name: temp.copy() for name in watchlist}
+pdb.set_trace()
 
 print("Waiting for market to open")
 dtime = datetime.datetime.now()
